@@ -1,6 +1,6 @@
 // services/api/authService.ts
 import axios from 'axios';
-import { LoginCredentials, LoginResponse, User } from '../types/auth.types';
+import { LoginCredentials, LoginResponse, User } from '../../../types/auth.types.ts';
 
 
 const api = axios.create({

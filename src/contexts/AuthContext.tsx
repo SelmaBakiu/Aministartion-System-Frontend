@@ -1,7 +1,7 @@
 // contexts/AuthContext.tsx
 import React, { createContext, useReducer, useEffect } from 'react';
 import { AuthState, AuthContextType, User, LoginCredentials } from '../types/auth.types';
-import { loginUser, validateToken } from '../services/AuthService';
+import { loginUser, validateToken } from '../features/login/api/AuthService.ts';
 
 type AuthAction = 
   | { type: 'LOGIN_START' }

@@ -1,10 +1,10 @@
-// pages/LoginPage.tsx
+// features/LoginPage.tsx
 import React, { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Form, Button, Alert, InputGroup, Spinner } from 'react-bootstrap';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
-import { useAuth } from '../hooks/useAuth';
-import { LoginCredentials } from '../types/auth.types';
+import { useAuth } from '../../../hooks/useAuth.ts';
+import { LoginCredentials } from '../../../types/auth.types.ts';
 
 const LoginPage: React.FC = () => {
   const [credentials, setCredentials] = useState<LoginCredentials>({
