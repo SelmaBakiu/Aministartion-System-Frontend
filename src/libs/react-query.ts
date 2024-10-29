@@ -15,7 +15,7 @@ export const queryClient = new QueryClient(
     queryCache: new QueryCache({
       onError: (error, query) => {
         if(error instanceof AxiosError)
-            Alert(error.message);
+            Alert(error.response?.data.message);
           }
     }),
   }

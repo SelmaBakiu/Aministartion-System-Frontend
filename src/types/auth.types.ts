@@ -1,5 +1,5 @@
 
-export type UserRole = 'ADMINISTRATOR' | 'EMPLOYEE';
+export type UserRole = 'administrator' | 'employee';
 
 export interface User {
   id: number;
@@ -10,12 +10,12 @@ export interface User {
   profile_picture?: string;
 }
 
-export interface AuthState {
-  user: User | null;
-  token: string | null;
-  isAuthenticated: boolean;
-  loading: boolean;
-}
+// export interface AuthState {
+//   user: User | null;
+//   token: string | null;
+//   isAuthenticated: boolean;
+//   loading: boolean;
+// }
 
 export interface LoginCredentials {
   email: string;
@@ -27,12 +27,12 @@ export interface LoginResponse {
   user: User;
 }
 
-export interface AuthContextType {
-  user: User | null;
-  token: string | null;
-  isAuthenticated: boolean;
-  loading: boolean;
-  login: (credentials: LoginCredentials) => Promise<void>;
-  logout: () => void;
-  updateUser: (user: User) => void;
-}
+// export interface AuthContextType {
+//   user: User | null;
+//   token: string | null;
+//   isAuthenticated: boolean;
+//   loading: boolean;
+//   login: (credentials: LoginCredentials) => Promise<void>;
+//   logout: () => void;
+//   updateUser: (user: User) => void;
+// }

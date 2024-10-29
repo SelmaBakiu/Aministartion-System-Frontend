@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 
+=======
+// src/chat/components/ChatMessage.tsx
+>>>>>>> Stashed changes
 import React from 'react';
 import { Message } from '../api/ChatService';
 
