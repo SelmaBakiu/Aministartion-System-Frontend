@@ -1,21 +1,16 @@
 
-export type UserRole = 'ADMINISTRATOR' | 'EMPLOYEE';
+export type UserRole = 'administrator' | 'employee';
 
 export interface User {
   id: number;
   email: string;
-  name: string;
+  firstName: string;
+  lastName:string;
   role: UserRole;
   department_id?: number;
-  profile_picture?: string;
+  profileImageUrl?: string; 
 }
 
-export interface AuthState {
-  user: User | null;
-  token: string | null;
-  isAuthenticated: boolean;
-  loading: boolean;
-}
 
 export interface LoginCredentials {
   email: string;
@@ -25,14 +20,4 @@ export interface LoginCredentials {
 export interface LoginResponse {
   token: string;
   user: User;
-}
-
-export interface AuthContextType {
-  user: User | null;
-  token: string | null;
-  isAuthenticated: boolean;
-  loading: boolean;
-  login: (credentials: LoginCredentials) => Promise<void>;
-  logout: () => void;
-  updateUser: (user: User) => void;
 }

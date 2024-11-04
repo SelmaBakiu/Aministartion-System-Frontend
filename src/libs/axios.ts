@@ -1,25 +1,32 @@
-import axios from 'axios'
+import Axios, {AxiosError, InternalAxiosRequestConfig} from "axios";
+import storage from "../utils/storage.ts";
+import {API_URL} from "../config";
 
-const AxiosInstance = axios.create({
-  baseURL: 'http://localhost:8000/',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
+function authRequestInterceptor(config: InternalAxiosRequestConfig) {
+    const user = storage.getUser();
 
-AxiosInstance.interceptors.request.use(
-    (config) => {
-      const token = localStorage.getItem('access_token')
-      if (token) {
-        config.headers['Authorization'] = `Bearer ${token}`
-        console.log(
-            'Authorization header:',
-            config.headers['Authorization'],
-        )
-      }
-      return config
+    if (user?.token) {
+        config.headers["Authorization"] = "Bearer " + `${user.token}`;
+    }
+    return config;
+}
+
+export const axios = Axios.create({
+    baseURL: API_URL,
+});
+
+export type ErrorDetails = {
+    message: string;
+    code: number;
+};
+
+axios.interceptors.request.use(authRequestInterceptor);
+axios.interceptors.response.use(
+    (response) => {
+        return response.data;
     },
-    (error) => Promise.reject(error),
-)
-
-export default AxiosInstance
+    (error: AxiosError<any>): Promise<ErrorDetails> => {
+        const message = error.response?.data?.message || error.message;
+        return Promise.reject({message, code: error.response?.status});
+    }
+);
