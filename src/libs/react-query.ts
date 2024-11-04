@@ -1,6 +1,5 @@
 import {AxiosError} from "axios";
 import {DefaultOptions, QueryCache, QueryClient} from "react-query";
-import {Alert} from "react-bootstrap";
 
 const queryConfig: DefaultOptions = {
   queries: {
@@ -15,7 +14,7 @@ export const queryClient = new QueryClient(
     queryCache: new QueryCache({
       onError: (error, query) => {
         if(error instanceof AxiosError)
-            Alert(error.response?.data.message);
+          console.error(`[AxiosError] ${error.message} for query ${query.queryKey}`);
           }
     }),
   }

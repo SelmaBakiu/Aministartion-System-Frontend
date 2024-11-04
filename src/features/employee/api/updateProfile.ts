@@ -1,16 +1,18 @@
+import { UpdateEmployee } from "../types/index.ts";
+import { axios } from "../../../libs/axios.ts";
 import { useMutation } from "react-query";
 import { QUERY_KEYS } from "../../../config/queryKeys.ts";
 import { queryClient } from "../../../libs/react-query.ts";
-import { axios } from "../../../libs/axios.ts";
+import storage from "../../../utils/storage.ts";
 
-export const deleteEmployee = (id: string) => {
-  return axios.delete(`/user/${id}`);
+export const updateProfile = (employee: UpdateEmployee) => {
+  return axios.patch(`/user/${storage.getUser().user.id}`, employee);
 };
 
-export const useDeleteEmployee = () => {
+export const useupdateProfile = () => {
   return useMutation({
     mutationKey: [QUERY_KEYS.employees],
-    mutationFn: deleteEmployee,
+    mutationFn: updateProfile,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.employees] });
     },

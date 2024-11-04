@@ -1,4 +1,4 @@
-import {Button} from "react-bootstrap";
+
 import {ErrorBoundary} from "react-error-boundary";
 import {HelmetProvider} from "react-helmet-async";
 import {QueryClientProvider} from "react-query";
@@ -13,9 +13,7 @@ const ErrorFallback = () => {
             <h1 style={{color:"red"}}>
                 Ooops, something went wrong :(
             </h1>
-            <Button onClick={() => window.location.assign(window.location.origin)}>
-                Refresh
-            </Button>
+
         </div>
     );
 };

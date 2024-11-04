@@ -1,142 +1,353 @@
-import React, {useState} from 'react';
-import {useNavigate, Navigate} from 'react-router-dom';
-import {Container, Row, Col, Card, Form, Button, Alert, InputGroup, Spinner} from 'react-bootstrap';
-import {FaEnvelope, FaLock, FaEye, FaEyeSlash} from 'react-icons/fa';
-import {LoginCredentials} from '../../../types/auth.types';
-import {useLogin} from "../api/login.ts";
+import React, { useState } from "react";
+import {
+  Container,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  Checkbox,
+  FormControlLabel,
+  InputAdornment,
+  IconButton,
+  Alert,
+  CircularProgress,
+} from "@mui/material";
+import {
+  Email as EmailIcon,
+  Lock as LockIcon,
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon,
+} from "@mui/icons-material";
+import { useLogin } from "../api/login.ts";
+import { forgetPassword } from "../api/forgetPassword.ts";
+import { colors } from "../../../styles/colors";
+import Toast from "../../../components/Toast/Toast.tsx";
 
-const LoginPage: React.FC = () => {
-    const [credentials, setCredentials] = useState<LoginCredentials>({
-        email: '',
-        password: ''
-    });
-    const [showPassword, setShowPassword] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false);
+interface LoginFormData {
+  email: string;
+  password: string;
+}
 
-    const login = useLogin();
+interface LoginFormErrors {
+  email?: string;
+  password?: string;
+  general?: string;
+}
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = e.target;
-        setCredentials(prev => ({
-            ...prev,
-            [name]: value
-        }));
-        setError(null);
-    };
+const LoginForm: React.FC = () => {
+  const [formData, setFormData] = useState<LoginFormData>({
+    email: "",
+    password: "",
+  });
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-        setError(null);
+  const [errors, setErrors] = useState<LoginFormErrors>({});
+  const [loading, setLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastSeverity, setToastSeverity] = useState<"success" | "error">(
+    "error"
+  );
 
-        try {
-            await login.mutate({
-                email: credentials.email,
-                password: credentials.password
-            });
-        } catch (err) {
-            setError('Invalid email or password. Please try again.');
-        } finally {
-            setLoading(false);
-        }
-    };
+  const login = useLogin();
 
-    return (
-        <Container fluid className="bg-light min-vh-100 d-flex align-items-center justify-content-center py-5">
-            <Row className="justify-content-center w-100">
-                <Col xs={12} sm={10} md={8} lg={6} xl={4}>
-                    <Card className="shadow-lg border-0">
-                        <Card.Body className="p-4">
-                            <div className="text-center mb-4">
-                                <h2 className="fw-bold">Welcome</h2>
-                                <p className="text-muted">Sign in to your account</p>
-                            </div>
+  const validateForm = (): boolean => {
+    const newErrors: LoginFormErrors = {};
 
-                            {error && (
-                                <Alert variant="danger" className="mb-4">
-                                    {error}
-                                </Alert>
-                            )}
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email";
+    }
 
-                            <Form onSubmit={handleSubmit}>
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Email Address</Form.Label>
-                                    <InputGroup>
-                                        <InputGroup.Text>
-                                            <FaEnvelope/>
-                                        </InputGroup.Text>
-                                        <Form.Control
-                                            type="email"
-                                            name="email"
-                                            value={credentials.email}
-                                            onChange={handleChange}
-                                            placeholder="Enter your email"
-                                            required
-                                        />
-                                    </InputGroup>
-                                </Form.Group>
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
+    }
 
-                                <Form.Group className="mb-4">
-                                    <Form.Label>Password</Form.Label>
-                                    <InputGroup>
-                                        <InputGroup.Text>
-                                            <FaLock/>
-                                        </InputGroup.Text>
-                                        <Form.Control
-                                            type={showPassword ? "text" : "password"}
-                                            name="password"
-                                            value={credentials.password}
-                                            onChange={handleChange}
-                                            placeholder="Enter your password"
-                                            required
-                                        />
-                                        <Button
-                                            variant="outline-secondary"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                        >
-                                            {showPassword ? <FaEyeSlash/> : <FaEye/>}
-                                        </Button>
-                                    </InputGroup>
-                                </Form.Group>
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-                                <div className="d-flex justify-content-between align-items-center mb-4">
-                                    <Form.Check
-                                        type="checkbox"
-                                        id="remember-me"
-                                        label="Remember me"
-                                    />
-                                </div>
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
 
-                                <Button
-                                    variant="primary"
-                                    type="submit"
-                                    className="w-100"
-                                    disabled={loading}
-                                >
-                                    {loading ? (
-                                        <>
-                                            <Spinner
-                                                as="span"
-                                                animation="border"
-                                                size="sm"
-                                                role="status"
-                                                aria-hidden="true"
-                                                className="me-2"
-                                            />
-                                            Signing in...
-                                        </>
-                                    ) : (
-                                        'Sign In'
-                                    )}
-                                </Button>
-                            </Form>
-                        </Card.Body>
-                    </Card>
-                </Col>
-            </Row>
-        </Container>
-    );
+    if (errors[name as keyof LoginFormErrors]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: undefined,
+      }));
+    }
+  };
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await login.mutateAsync({
+        email: formData.email,
+        password: formData.password,
+      });
+      setToastMessage("Login successful!");
+      setToastSeverity("success");
+      setToastOpen(true);
+    } catch (error) {
+      setErrors({
+        general: "Invalid email or password",
+      });
+      setToastMessage("Invalid email or password");
+      setToastSeverity("error");
+      setToastOpen(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgetPassword = async (): Promise<void> => {
+    await forgetPassword(formData.email);
+    setToastOpen(true);
+    setToastMessage("An email has been sent to your email address");
+    setToastSeverity("success");
+  };
+
+  return (
+    <Container component="main" maxWidth="xs">
+      <Box
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "transparent",
+        }}
+      >
+        <Paper
+          elevation={6}
+          sx={{
+            padding: 4,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            width: "100%",
+            borderRadius: "16px",
+            background: "white",
+            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          <Typography
+            component="h1"
+            variant="h4"
+            gutterBottom
+            sx={{
+              color: colors.primary,
+              fontWeight: "bold",
+              mb: 1,
+            }}
+          >
+            Welcome Back
+          </Typography>
+          <Typography
+            color="textSecondary"
+            gutterBottom
+            sx={{
+              mb: 3,
+              color: colors.text,
+            }}
+          >
+            Please sign in to continue
+          </Typography>
+          {errors.general && (
+            <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
+              {errors.general}
+            </Alert>
+          )}
+          <Box component="form" onSubmit={handleSubmit} sx={{ width: "100%" }}>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              value={formData.email}
+              onChange={handleChange}
+              error={!!errors.email}
+              helperText={errors.email}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "&:hover fieldset": {
+                    borderColor: colors.primary,
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: colors.primary,
+                  },
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: colors.primary,
+                },
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <EmailIcon sx={{ color: colors.primary }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              id="password"
+              autoComplete="current-password"
+              value={formData.password}
+              onChange={handleChange}
+              error={!!errors.password}
+              helperText={errors.password}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  "&:hover fieldset": {
+                    borderColor: colors.primary,
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: colors.primary,
+                  },
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: colors.primary,
+                },
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockIcon sx={{ color: colors.primary }} />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                      sx={{ color: colors.primary }}
+                    >
+                      {showPassword ? (
+                        <VisibilityOffIcon />
+                      ) : (
+                        <VisibilityIcon />
+                      )}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mt: 2,
+              }}
+            >
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    sx={{
+                      color: colors.primary,
+                      "&.Mui-checked": {
+                        color: colors.primary,
+                      },
+                    }}
+                  />
+                }
+                label="Remember me"
+                sx={{ color: colors.text }}
+              />
+
+              <Button
+                onClick={() => handleForgetPassword()}
+                sx={{
+                  color: colors.secondary,
+                  "&:hover": {
+                    backgroundColor: "transparent",
+                    textDecoration: "underline",
+                  },
+                }}
+              >
+                Forgot password?
+              </Button>
+            </Box>
+
+            <Box sx={{ mt: 2 }}>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                disabled={loading}
+                sx={{
+                  mt: 3,
+                  mb: 2,
+                  height: "48px",
+                  backgroundColor: colors.primary,
+                  color: "white",
+                  borderRadius: "8px",
+                  textTransform: "none",
+                  fontSize: "1.1rem",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: colors.secondary,
+                    transform: "translateY(-2px)",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                  },
+                  "&:disabled": {
+                    backgroundColor: "#ccc",
+                  },
+                }}
+              >
+                {loading ? (
+                  <>
+                    <CircularProgress
+                      size={24}
+                      sx={{ mr: 1, color: "white" }}
+                    />
+                    Signing in...
+                  </>
+                ) : (
+                  "Sign In"
+                )}
+              </Button>
+            </Box>
+          </Box>
+          <Toast
+            open={toastOpen}
+            onClose={() => setToastOpen(false)}
+            message={toastMessage}
+            severity={toastSeverity}
+          />
+        </Paper>
+      </Box>
+    </Container>
+  );
 };
 
-export default LoginPage;
+export default LoginForm;

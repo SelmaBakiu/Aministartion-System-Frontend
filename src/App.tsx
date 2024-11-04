@@ -1,7 +1,7 @@
 import React from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import {AppRoutes} from "./routes";
 import {AppProvider} from "./providers/AppProvider.tsx";
+import './styles/App.css';
 
 
 const App: React.FC = () => {

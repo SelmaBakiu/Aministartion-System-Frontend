@@ -1,5 +1,5 @@
 export type Employee = {
-  id: string | '';
+  id: string | "";
   firstName: string;
   lastName: string;
   email: string;
@@ -20,7 +20,6 @@ export type Employee = {
 };
 
 export type UpdateEmployee = {
-  id: number ;
   firstName: string;
   lastName: string;
   email: string;
@@ -29,5 +28,21 @@ export type UpdateEmployee = {
   phoneNumber: string;
   dateOfBirth: string;
   address: string;
-  profileImageUrl: string;
+};
+
+export type InsertEmployee = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  departmentId: string;
+  position: string;
+  phoneNumber: string;
+  dateOfBirth: string;
+  address: string;
+  password: string;
+};
+
+export type ResetPasswordRequest = {
+  oldPassword: string;
+  newPassword: string;
 };

@@ -4,14 +4,6 @@ import {API_URL} from "../config";
 
 function authRequestInterceptor(config: InternalAxiosRequestConfig) {
     const user = storage.getUser();
-    //if token is expired -tokenExpiration is not implemented
-    //todo: delete the checkAuth below if tokenExpiration is not implemented
-    // if (!user.token || user.tokenExpiration < Date.now()) {
-    //     //logout
-    //     storage.clearUser();
-    //     window.location.href = "/";
-    //     return;
-    // }
 
     if (user?.token) {
         config.headers["Authorization"] = "Bearer " + `${user.token}`;

@@ -1,18 +1,15 @@
-import {axios} from "../../../libs/axios.ts";
-import {useQuery} from "react-query";
-import {QUERY_KEYS} from "../../../config/queryKeys.ts";
+import { axios } from "../../../libs/axios.ts";
+import { useQuery } from "react-query";
+import { QUERY_KEYS } from "../../../config/queryKeys.ts";
+import { Employee } from "../../employee/types/index.ts";
 
-export const getAllContacts = (): Promise<{
-    id: string,
-    firstName: string,
-    lastName: string,
-}[]> => {
-    return axios.get(`/user/chat`)
-}
+export const getContacts = (): Promise<Employee[]> => {
+  return axios.get(`/user/chat`);
+};
 
-export const useGetAllContacts = () => {
-    return useQuery({
-        queryKey: [QUERY_KEYS.employees],
-        queryFn: () => getAllContacts()
-    })
-}
+export const useGetContacts = () => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.employees],
+    queryFn: () => getContacts(),
+  });
+};

@@ -1,11 +1,14 @@
+import { Box, Container } from '@mui/material';
 import NavbarComponent from '../Navbar/Navbar';
 
 const Layout = ({ children, navbarChildren }: { children: JSX.Element; navbarChildren?: React.ReactNode }) => {
   return (
-    <div>
+    <Box>
       <NavbarComponent>{navbarChildren}</NavbarComponent>
-      <div className="container mt-4">{children}</div>
-    </div>
+      <Container sx={{ mt: 4 }}>
+        {children}
+      </Container>
+    </Box>
   );
 };
 
