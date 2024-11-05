@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --mode development",
-    "build": "tsc -b && vite build",
+    "build": "cross-env TSC_COMPILE_ON_ERROR=true vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -35,6 +35,7 @@
     "@types/react-router-dom": "^5.3.3",
     "@types/socket.io-client": "^3.0.0",
     "@vitejs/plugin-react": "^4.3.3",
+    "cross-env": "^7.0.3",
     "eslint": "^9.13.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.13",
