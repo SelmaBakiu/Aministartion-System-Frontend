@@ -30,8 +30,7 @@ export const UpdateDepartmentForm: React.FC<UpdateDepartmentFormProps> = ({
     parentDepartmentId: department.parentDepartmentId,
   };
 
-  const [formData, setFormData] =
-    useState<UpdateDepartment>(initialFormData);
+  const [formData, setFormData] = useState<UpdateDepartment>(initialFormData);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>
@@ -73,49 +72,52 @@ export const UpdateDepartmentForm: React.FC<UpdateDepartmentFormProps> = ({
         rows={3}
       />
 
-      <FormControl fullWidth>
-        <InputLabel>Parent Department</InputLabel>
-        <Select
-          name="parentDepartmentId"
-          value={formData.parentDepartmentId || ""}
-          onChange={handleChange}
-          label="Parent Department"
-        >
-          <MenuItem value="">None</MenuItem>
-          {departments
-            .filter((dept) => dept.id !== department.id && !dept.isDeleted)
-            .map((dept) => (
-              <MenuItem key={dept.id} value={dept.id}>
-                {dept.name}
-              </MenuItem>
-            ))}
-        </Select>
-      </FormControl>
+      {formData.parentDepartmentId !== null && (
+        <FormControl fullWidth>
+          <InputLabel>Parent Department</InputLabel>
+          <Select
+            name="parentDepartmentId"
+            value={formData.parentDepartmentId || ""}
+            onChange={handleChange}
+            label="Parent Department"
+          >
+            {departments
+              .filter((dept) => dept.id !== department.id && !dept.isDeleted)
+              .map((dept) => {
+                return dept.parentDepartmentId !== department.id ? (
+                  <MenuItem key={dept.id} value={dept.id} selected>
+                    {dept.name}
+                  </MenuItem>
+                ) : null;
+              })}
+          </Select>
+        </FormControl>
+      )}
 
       <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end", mt: 2 }}>
-      <Button
-              variant="outlined"
-              onClick={onCancel}
-              sx={{
-                color: "#1976d2",
-                borderColor: colors.secondary,
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="contained"
-             onClick={handleSubmit}
-              sx={{ 
-                bgcolor: colors.primary,
-                '&:hover': {
-                  bgcolor: colors.primary + 'dd',
-                }
-              }}
-            >
-              Update
-            </Button>
+        <Button
+          variant="outlined"
+          onClick={onCancel}
+          sx={{
+            color: "#1976d2",
+            borderColor: colors.secondary,
+          }}
+        >
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          variant="contained"
+          onClick={handleSubmit}
+          sx={{
+            bgcolor: colors.primary,
+            "&:hover": {
+              bgcolor: colors.primary + "dd",
+            },
+          }}
+        >
+          Update
+        </Button>
       </Box>
     </Box>
   );

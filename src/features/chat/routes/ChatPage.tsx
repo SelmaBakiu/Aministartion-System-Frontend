@@ -1,5 +1,6 @@
+// ChatPage.tsx
 import { useState, useEffect, useRef } from "react";
-import { Box, Grid } from "@mui/material";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 import storage from "../../../utils/storage";
 import { chatApi, Message } from "../api/ChatService";
 import { useGetContacts } from "../api/getContacts";
@@ -7,6 +8,9 @@ import ChatArea from "../components/ChatArea";
 import UsersList from "../components/UsersList";
 
 export const ChatPage = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [showUsersList, setShowUsersList] = useState(!isMobile);
   const [receiverId, setReceiverId] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
@@ -48,7 +52,7 @@ export const ChatPage = () => {
           );
           setMessages(sortedMessages);
         } catch (error) {
-          console.error("Failed to fetch conversation:", error);
+          console.error("Failed to fetch messages:", error);
         } finally {
           setIsLoading(false);
         }
@@ -80,38 +84,60 @@ export const ChatPage = () => {
     }
   };
 
+  const toggleView = () => {
+    setShowUsersList(!showUsersList);
+  };
+
   return (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: "row",
-        p: 2,
+        display: 'flex',
+        flexDirection: 'row',
+        p: { xs: 0, sm: 2 },
         bgcolor: "white",
-        borderRadius: 2,
+        borderRadius: { xs: 0, sm: 2 },
         boxShadow: 1,
-        height: "80vh",
+        height: { xs: '100vh', sm: '80vh' },
         maxWidth: "1200px",
-
+        overflow: 'hidden',
+        margin: { xs: 0, sm: 'auto' },
       }}
     >
-       <Grid item xs={3}>
-        <UsersList
-          users={users?.data}
-          currentUserId={currentUser.id.toString()}
-          selectedUserId={receiverId}
-          onUserSelect={setReceiverId}
+      {(!isMobile || (isMobile && showUsersList)) && (
+        <Box
+          sx={{
+            width: { xs: '100%', sm: '300px' },
+            flexShrink: 0,
+            height: '100%',
+          }}
+        >
+          <UsersList
+            users={users?.data}
+            currentUserId={currentUser.id.toString()}
+            selectedUserId={receiverId}
+            onUserSelect={(userId) => {
+              setReceiverId(userId);
+              if (isMobile) {
+                setShowUsersList(false);
+              }
+            }}
+          />
+        </Box>
+      )}
+
+      {(!isMobile || (isMobile && !showUsersList)) && (
+        <ChatArea
+          receiver={Array.isArray(users?.data) ? users.data.find((user) => user.id === receiverId) : undefined}
+          currentUser={currentUser}
+          messages={messages}
+          isLoading={isLoading}
+          newMessage={newMessage}
+          onNewMessageChange={setNewMessage}
+          onSendMessage={handleSendMessage}
+          messagesEndRef={messagesEndRef}
+          onBack={isMobile ? toggleView : undefined}
         />
-      </Grid>
-      <ChatArea
-        receiver={Array.isArray(users?.data) ? users.data.find((user) => user.id === receiverId) : undefined}
-        currentUser={currentUser}
-        messages={messages}
-        isLoading={isLoading}
-        newMessage={newMessage}
-        onNewMessageChange={setNewMessage}
-        onSendMessage={handleSendMessage}
-        messagesEndRef={messagesEndRef}
-      />
+      )}
     </Box>
   );
 };

@@ -132,7 +132,6 @@ const CreateDepartmentButton: React.FC = () => {
               label="Parent Department"
               disabled={isLoadingDepartments}
             >
-              <MenuItem value="">None</MenuItem>
               {departments
                 .filter((dept) => !dept.isDeleted)
                 .map((dept) => (

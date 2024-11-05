@@ -1,4 +1,5 @@
-import { List, ListItem, ListItemText, Avatar } from "@mui/material";
+// UsersList.tsx
+import { List, ListItem, ListItemText, Avatar, Typography, Box } from "@mui/material";
 import { colors } from "../../../styles/colors";
 import { Employee } from "../../employee/types";
 
@@ -16,24 +17,32 @@ const UsersList = ({
   onUserSelect,
 }: UsersListProps) => {
   const filteredUsers = Array.isArray(users) ? users.filter((user) => user.id !== currentUserId) : [];
+  
   return (
     <List
       sx={{
-        width: "300px",
-        borderRight: `1px solid ${colors.accent}`,
+        height: '100%',
+        width: '100%',
+        borderRight: { xs: 'none', sm: `1px solid ${colors.accent}` },
         bgcolor: colors.background,
-        borderRadius: 1,
+        borderRadius: { xs: 0, sm: 1 },
         overflowY: "auto",
+        p: 0,
       }}
     >
+      <Box sx={{ p: 2, borderBottom: `1px solid ${colors.accent}` }}>
+        <Typography variant="h6" sx={{ color: colors.text }}>
+          Chats
+        </Typography>
+      </Box>
       {filteredUsers.map((user) => (
         <ListItem
           key={user.id}
           onClick={() => onUserSelect(user.id)}
           sx={{
             cursor: "pointer",
-            mb: 0.5,
-            borderRadius: 1,
+            py: 2,
+            borderBottom: `1px solid ${colors.accent}`,
             backgroundColor:
               selectedUserId === user.id ? colors.accent : "transparent",
             color: colors.text,
@@ -50,7 +59,14 @@ const UsersList = ({
           >
             {user.firstName.charAt(0)}
           </Avatar>
-          <ListItemText primary={`${user.firstName} ${user.lastName}`} />
+          <ListItemText 
+            primary={`${user.firstName} ${user.lastName}`}
+            sx={{
+              '& .MuiListItemText-primary': {
+                fontWeight: 500,
+              }
+            }}
+          />
         </ListItem>
       ))}
     </List>

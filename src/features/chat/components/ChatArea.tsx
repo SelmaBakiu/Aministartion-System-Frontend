@@ -1,3 +1,4 @@
+// ChatArea.tsx
 import {
   Box,
   Paper,
@@ -5,7 +6,11 @@ import {
   TextField,
   Button,
   Avatar,
+  IconButton,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { colors } from "../../../styles/colors";
 import { Message } from "../api/ChatService";
 import { User } from "../../../types/auth.types";
@@ -19,9 +24,10 @@ interface ChatAreaProps {
   onNewMessageChange: (message: string) => void;
   onSendMessage: () => void;
   messagesEndRef: React.RefObject<HTMLDivElement>;
+  onBack?: () => void;
 }
 
-const ChatHeader = ({ receiver }: { receiver: any }) => (
+const ChatHeader = ({ receiver, onBack }: { receiver: any; onBack?: () => void }) => (
   <Box
     sx={{
       mb: 2,
@@ -31,12 +37,17 @@ const ChatHeader = ({ receiver }: { receiver: any }) => (
       alignItems: "center",
     }}
   >
+    {onBack && (
+      <IconButton onClick={onBack} sx={{ mr: 1 }}>
+        <ArrowBackIcon />
+      </IconButton>
+    )}
     <Avatar
       sx={{ mr: 2 }}
       src={receiver?.profileImageUrl}
       alt={receiver?.firstName}
     >
-      {receiver?.firstName.charAt(0)}
+      {receiver?.firstName?.charAt(0)}
     </Avatar>
     <Typography variant="h6" sx={{ color: colors.text }}>
       {receiver?.firstName} {receiver?.lastName}
@@ -56,6 +67,8 @@ const MessageItem = ({
   receiver: any;
 }) => {
   const messageTime = new Date(message.createdAt).toLocaleTimeString();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
     <Box
@@ -87,7 +100,7 @@ const MessageItem = ({
         >
           {isCurrentUserMessage
             ? currentUser.firstName.charAt(0)
-            : receiver?.firstName.charAt(0)}
+            : receiver?.firstName?.charAt(0)}
         </Avatar>
         <Typography
           variant="caption"
@@ -107,7 +120,7 @@ const MessageItem = ({
           p: 1.5,
           px: 2,
           borderRadius: "20px",
-          maxWidth: "70%",
+          maxWidth: isMobile ? "85%" : "70%",
           wordBreak: "break-word",
           backgroundColor: isCurrentUserMessage
             ? colors.primary
@@ -150,7 +163,7 @@ const MessagesList = ({
       flexGrow: 1,
       overflowY: "auto",
       position: "relative",
-      px: 2,
+      px: { xs: 1, sm: 2 },
     }}
   >
     {isLoading ? (
@@ -181,7 +194,7 @@ const MessageInput = ({
   onNewMessageChange: (message: string) => void;
   onSendMessage: () => void;
 }) => (
-  <Box sx={{ display: "flex", mt: "auto"}}>
+  <Box sx={{ display: "flex", mt: "auto", p: { xs: 1, sm: 0 } }}>
     <TextField
       fullWidth
       variant="outlined"
@@ -230,15 +243,23 @@ const ChatArea = ({
   onNewMessageChange,
   onSendMessage,
   messagesEndRef,
+  onBack,
 }: ChatAreaProps) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   if (!receiver) {
     return (
-      <Box sx={{ ml: 2, flexGrow: 1 }}>
+      <Box sx={{ 
+        flexGrow: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        p: 2 
+      }}>
         <Typography
           variant="body1"
           sx={{
-            textAlign: "center",
-            mt: 4,
             color: colors.text,
           }}
         >
@@ -249,18 +270,25 @@ const ChatArea = ({
   }
 
   return (
-    <Box sx={{ ml: 2, display: "flex", flexDirection: "column", flexGrow: 1 }}>
+    <Box sx={{ 
+      display: "flex", 
+      flexDirection: "column", 
+      flexGrow: 1,
+      height: '100%',
+      width: '100%',
+    }}>
       <Paper
         sx={{
           display: "flex",
           flexDirection: "column",
-          height: "95%",
-          p: 2,
+          height: "100%",
+          p: { xs: 1, sm: 2 },
           bgcolor: "white",
-          borderRadius: 2,
+          borderRadius: { xs: 0, sm: 2 },
         }}
+        elevation={isMobile ? 0 : 1}
       >
-        <ChatHeader receiver={receiver} />
+        <ChatHeader receiver={receiver} onBack={onBack} />
         <MessagesList
           messages={messages}
           isLoading={isLoading}
